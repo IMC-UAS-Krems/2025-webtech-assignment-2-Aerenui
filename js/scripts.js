@@ -11,11 +11,12 @@ let UNIQUE_ID_STORE = undefined;
 window.onload = () => {afterLoad()};
 
 function afterLoad() {
-    const reg = document.getElementById("components");
+    // const reg = document.getElementById("components");
+    const reg = document.getElementsByTagName("template")[0].content;
     for (const e of reg.children) {
-        COMPONENT_REGISTRY.push(new Component(e.id));
+        COMPONENT_REGISTRY.push(new Component(e.id, false, e.innerHTML));
     }
-    reg.remove();
+    // reg.remove();
     importSyntheticComponents();
     populateItems();
     render_page();
@@ -236,18 +237,16 @@ function populateItems() {
         id_cnt++;
     };
 
-    make("Item1", "description", 10, "/img/cat.png");
-    make("Item2", "description", 100, "/img/cat.png");
+    make("Base Item", "description", 10, "/img/cat.png");
+    for(let i=1;i<15;i++) {
+        make("Item "+i.toString(), "description of item "+i.toString(), 2^i, "/img/cat.png");
+    }
+
     make("Martin", "mr", 10000, "/img/cat.png");
 }
 
 
 
-/**
- * @type {BCResult}
- * */
-let counter_obj;
-let counter = 0;
 
 
 let basktet_cnt;
@@ -263,11 +262,6 @@ let modal_checkout_btn;
 
 // call on initialization
 function render_page() {
-    counter_obj = make_updatable("p", "count = " + counter);
-
-    make("container", join(
-        counter_obj,
-    )).append("dbg");
 
     modal_basket = make_updatable("div", "empty");
 
