@@ -26,7 +26,7 @@
         <div id="modal-item">
             <div class="d-flex justify-content-between pe-2 ps-2">
 <!--                <div class="row">-->
-                <div class=""> % <!-- NAME --> </div>
+                <div class=""> % % <!-- NAME --> </div>
                 <div class=""> %€ <!-- PRICE --> </div>
                 <!--                </div>-->
             </div>
@@ -52,7 +52,7 @@
                         % <!--  basket card icon  -->
                     </button>
                     <!-- Modal -->
-                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal fade" id="exampleModal" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -82,6 +82,19 @@
             </div>
         </div>
 
+        <div id="items-item-buy-btn">
+            <button class="btn btn-primary w-100" onclick="action_item_buy('%')">Add to card</button>
+        </div>
+
+        <div id="items-item-buy-modify">
+            <div class="input-group">
+                <span class="input-group-text w-auto">quantity</span>
+                <button class="btn input-group-text" onclick="if (document.getElementById('qty_mod_%').value > 1) { document.getElementById('qty_mod_%').value -= 1; action_item_update('%', parseInt(document.getElementById('qty_mod_%').value)); } else action_item_remove('%');">-</button>
+                <input id="qty_mod_%" type="number" class="form-control input-number-hide-arrows" aria-label="quantity" value="1" min="1" onchange="if(this.value<1) action_item_remove('%'); else action_item_update('%', parseInt(this.value));">
+                <button class="btn input-group-text" onclick="document.getElementById('qty_mod_%').value = 1 + parseInt(document.getElementById('qty_mod_%').value); action_item_update('%', parseInt(document.getElementById('qty_mod_%').value));">+</button>
+            </div>
+        </div>
+
         <div id="items-item">
             <div class="card col-4" style="width: 18rem;">
                 <img src="%" class="card-img-top" alt="">
@@ -89,7 +102,9 @@
                     <h5 class="card-title">%</h5>
                     <p class="card-text">%</p>
                     <p class="card-footer">%€</p>
-                    <button class="btn btn-primary w-100" onclick="action_item_buy('%')">Add to card</button>
+                    <div class="w-auto text-center">
+                        %
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,10 +114,6 @@
     </nav>
 
     <main id="body">
-        <div class="container" id="dbg">
-            <button class="btn bg-primary" onclick="test()">increase counter</button>
-            <button class="btn bg-primary" onclick="add_test_item_to_basket()">add test item to basket</button>
-        </div>
     </main>
 
     <footer id="foot">

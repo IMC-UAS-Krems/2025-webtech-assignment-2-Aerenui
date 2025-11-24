@@ -142,6 +142,19 @@ class BCResult {
             document.getElementById(this.unique_id).classList.add("hide");
         }
     }
+
+    /**
+     * deletes item
+     * */
+    remove() {
+        if (this.unique_id === undefined) {
+            console.error("not updatable, id='" + this.unique_id + "'");
+            return;
+        }
+        const item = document.getElementById(this.unique_id);
+        if (item !== null)
+            item.remove();
+    }
 }
 
 /**
@@ -187,6 +200,13 @@ class Item  {
      * @param {String} description
      * @param {Number} price
      * @param {String} image_url
+     *
+     * @property {String} id
+     * @property {String} name
+     * @property {String} description
+     * @property {Number} price
+     * @property {String} image_url
+     * @property {BCResult|undefined} buy_or_modify_holder
      * */
     constructor(id, name, description, price, image_url) {
         this.id = id;
@@ -194,9 +214,12 @@ class Item  {
         this.description = description;
         this.price = price;
         this.image_url = image_url;
+        this.buy_or_modify_holder = undefined;
     }
     build_component() {
-        return make("items-item", this.image_url, this.name, this.description, this.price.toString(), this.id);
+        let btn = make_updatable("div", make("items-item-buy-btn", this.id));
+        this.buy_or_modify_holder = btn;
+        return make("items-item", this.image_url, this.name, this.description, this.price.toString(), btn);
     }
 }
 
@@ -215,6 +238,7 @@ function populateItems() {
 
     make("Item1", "description", 10, "/img/cat.png");
     make("Item2", "description", 100, "/img/cat.png");
+    make("Martin", "mr", 10000, "/img/cat.png");
 }
 
 
@@ -245,10 +269,7 @@ function render_page() {
         counter_obj,
     )).append("dbg");
 
-    modal_basket = make_updatable("div", "empty" /*join(
-        make("modal-item","apple", "2"),
-        make("modal-item", "juice", "5"),
-    )*/);
+    modal_basket = make_updatable("div", "empty");
 
     basktet_cnt = 0;
 
@@ -262,10 +283,6 @@ function render_page() {
     make("footer")
         .append("foot");
 
-        // make("items-item", "/img/cat.png", "title", "description", "100", "1"),
-        // make("items-item", "/img/cat.png", "title2", "description2", "5", "2"),
-        // make("items-item", "/img/cat.png", "title3", "description3", "13", "3"),
-        // make("items-item", "/img/cat.png", "title4", "description4", "10", "4"),
     items_container = make_updatable("row", "");
 
     make("items-container", items_container).append();
@@ -276,36 +293,90 @@ function render_page() {
     }
 }
 
-function test() {
-    counter++;
-    counter_obj.rerender("count = " + counter);
 
+/**
+ * @type {Map<String, Number>} Map<id, count>
+ */
+const BASKET_ITEMS = new Map();
+/**
+ * @type {Map<String, BCResult>} Map<id, updatable>
+ */
+const BASKET_MODAL_HANDLES = new Map();
+
+
+/**
+ * calculates current basket price
+ * @return {number}
+ */
+const calc_price = () => BASKET_ITEMS.entries().map(([k, v]) => ITEMS.get(k).price * v).reduce((p, c) => p + c, 0);
+
+function rerender_basket_price() {
+    // update price
+    const price = calc_price();
+    basktet_cnt = price;
+    basket_total1.rerender((price).toString());
+    basket_total2.rerender((price).toString());
+    // update modal
+
+    // used for adding items:
+    // modal_basket.additive_rerender(make("modal-item", "counter_"+counter, counter.toString()));
 }
 
-function add_test_item_to_basket() {
-
-    if (basktet_cnt === 0) {
+function display_empty_if_basket_empty(old_price, new_price) {
+    if (old_price === 0) {
         modal_basket.rerender("");
         modal_checkout_btn.rerender("");
     }
-    basktet_cnt += counter;
-    modal_basket.additive_rerender(make("modal-item", "counter_"+counter, counter.toString()));
-    basket_total2.rerender((basktet_cnt).toString());
-    basket_total1.rerender((basktet_cnt).toString());
+    if(new_price === 0) {
+        modal_basket.rerender("empty");
+        modal_checkout_btn.rerender("disabled");
+    }
 }
 
 /**
  * @param {String} id
  * */
 function action_item_buy(id) {
-    if (basktet_cnt === 0) {
-        modal_basket.rerender("");
-        modal_checkout_btn.rerender("");
-    }
-    basktet_cnt += ITEMS.get(id).price;
-    basket_total2.rerender((basktet_cnt).toString());
-    basket_total1.rerender((basktet_cnt).toString());
-    modal_basket.additive_rerender(
-        make("modal-item", ITEMS.get(id).name, ITEMS.get(id).price.toString())
-    );
+    console.log("called action_item_buy with id='"+id+"'");
+    display_empty_if_basket_empty(basktet_cnt,1);
+
+    BASKET_ITEMS.set(id, 1);
+
+    rerender_basket_price();
+
+    let modal_updt = make_updatable("modal-item", "", ITEMS.get(id).name, ITEMS.get(id).price.toString());
+
+    BASKET_MODAL_HANDLES.set(id, modal_updt);
+    modal_basket.additive_rerender(modal_updt);
+
+    // update buy button to quantity changer
+    ITEMS.get(id).buy_or_modify_holder.rerender(make("items-item-buy-modify", id, id, id, id, id, id, id, id, id, id, id, id));
 }
+
+/**
+ * @param {String} id
+ * */
+function action_item_remove(id) {
+    console.log("called action_item_remove with id='"+id+"'");
+    BASKET_ITEMS.delete(id);
+    if(BASKET_MODAL_HANDLES.has(id)) {
+        BASKET_MODAL_HANDLES.get(id).remove();
+        BASKET_MODAL_HANDLES.delete(id);
+    }
+    rerender_basket_price();
+    ITEMS.get(id).buy_or_modify_holder.rerender(make("items-item-buy-btn", id));
+
+    display_empty_if_basket_empty(1, basktet_cnt);
+}
+
+/**
+ * @param {String} id
+ * @param {number} qty
+ * */
+function action_item_update(id, qty) {
+    console.log("called action_item_update with id='"+id+"', qty="+qty.toString());
+    BASKET_ITEMS.set(id, qty);
+    rerender_basket_price();
+    BASKET_MODAL_HANDLES.get(id).rerender(qty === 1 ? "" : qty.toString()+"x", ITEMS.get(id).name, (ITEMS.get(id).price * qty).toString());
+}
+
