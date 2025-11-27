@@ -31,6 +31,7 @@ function importSyntheticComponents() {
     make_component("span", "<span> % </span>");
     make_component("a", "<a href=\"%\"> % </a>");
     make_component("row", "<div class='row'> % </div>");
+    make_component("row-centered", "<div class='row col-centered'> % </div>"); // col-centered
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -239,7 +240,7 @@ function populateItems() {
 
     make("Base Item", "description", 10, "/img/cat.png");
     for(let i=1;i<15;i++) {
-        make("Item "+i.toString(), "description of item "+i.toString(), 2^i, "/img/cat.png");
+        make("Item "+i.toString(), "description of item "+i.toString(), 2**i, "/img/cat.png");
     }
 
     make("Martin", "mr", 10000, "/img/cat.png");
@@ -271,13 +272,16 @@ function render_page() {
     basket_total2 = make_updatable("span", basktet_cnt.toString());
     modal_checkout_btn = make_updatable("modal-checkout-btn", "disabled");
 
-    make("navbar", "Shop", basket_total1, make("basket-icon"), modal_basket, basket_total2, modal_checkout_btn)
+    make("navbar", "Shop", basket_total1, make("basket-icon"))
         .append("nav");
+
+    make("basket-modal", modal_basket, basket_total2, modal_checkout_btn)
+        .append();
 
     make("footer")
         .append("foot");
 
-    items_container = make_updatable("row", "");
+    items_container = make_updatable("row-centered", "");
 
     make("items-container", items_container).append();
 
@@ -338,7 +342,7 @@ function action_item_buy(id) {
 
     rerender_basket_price();
 
-    let modal_updt = make_updatable("modal-item", "", ITEMS.get(id).name, ITEMS.get(id).price.toString());
+    let modal_updt = make_updatable("modal-item", "", ITEMS.get(id).name, ITEMS.get(id).price.toString(), id);
 
     BASKET_MODAL_HANDLES.set(id, modal_updt);
     modal_basket.additive_rerender(modal_updt);
@@ -371,6 +375,6 @@ function action_item_update(id, qty) {
     console.log("called action_item_update with id='"+id+"', qty="+qty.toString());
     BASKET_ITEMS.set(id, qty);
     rerender_basket_price();
-    BASKET_MODAL_HANDLES.get(id).rerender(qty === 1 ? "" : qty.toString()+"x", ITEMS.get(id).name, (ITEMS.get(id).price * qty).toString());
+    BASKET_MODAL_HANDLES.get(id).rerender(qty === 1 ? "" : qty.toString()+"x", ITEMS.get(id).name, (ITEMS.get(id).price * qty).toString(), id); // component-id="modal-item"
 }
 

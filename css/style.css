@@ -17,3 +17,10 @@
     margin: 0;
 }
 
+
+/* SOURCE: https://stackoverflow.com/questions/29128960/how-to-precisely-center-bootstrap-grid-in-html-page */
+.col-centered {
+    float: none;
+    margin-right: auto;
+    margin-left: auto;
+}

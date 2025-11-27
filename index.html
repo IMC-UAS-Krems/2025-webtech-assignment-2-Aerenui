@@ -28,7 +28,7 @@
         <div id="modal-item">
             <div class="d-flex justify-content-between pe-2 ps-2">
                 <div class=""> % % <!-- NAME --> </div>
-                <div class=""> %€ <!-- PRICE --> </div>
+                <div class=""> %€ <!-- PRICE --> <button class="btn text-danger" onclick="action_item_remove('%');" aria-label="remove item"> X </button> </div>
             </div>
         </div>
 
@@ -41,7 +41,7 @@
         </div>
 
         <div id="navbar">
-            <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="navbar sticky-top bg-body-tertiary">
                 <div class="container-fluid">
                     <p class="navbar-brand" href="">
                         % <!-- title -->
@@ -51,33 +51,40 @@
                         %€ <!-- price -->
                         % <!--  basket card icon  -->
                     </button>
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModal" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5">Basket</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    % <!-- ITEMS -->
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="container">
-                                        <div class="d-flex justify-content-between">
-                                            <div>
-                                                total is %€
-                                            </div>
-                                            <div>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                % <!-- Checkout btn -->
-                                            </div>
-                                        </div>
+        </div> </div> </div>
+
+        <div id="basket-modal">
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5">Basket</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            % <!-- ITEMS -->
+                        </div>
+                        <div class="modal-footer">
+                            <div class="container">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        total is %€
                                     </div>
-        </div> </div> </div> </div> </div> </nav> </div>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        % <!-- Checkout btn -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="items-container">
-            <div class="container p-2">
+            <div class="container p-2 mx-auto">
                 %
             </div>
         </div>
@@ -87,8 +94,8 @@
         </div>
 
         <div id="items-item-buy-modify">
-            <div class="input-group">
-                <span class="input-group-text w-auto">quantity</span>
+            <div class="input-group me-3 ms-3 w-auto">
+                <span class="input-group-text2" style="display: flex; align-items: center">quantity</span>
                 <button class="btn input-group-text" onclick="if (document.getElementById('qty_mod_%').value > 1) { document.getElementById('qty_mod_%').value -= 1; action_item_update('%', parseInt(document.getElementById('qty_mod_%').value)); } else action_item_remove('%');">-</button>
                 <input id="qty_mod_%" type="number" class="form-control input-number-hide-arrows" aria-label="quantity" value="1" min="1" onchange="if(this.value<1) action_item_remove('%'); else action_item_update('%', parseInt(this.value));">
                 <button class="btn input-group-text" onclick="document.getElementById('qty_mod_%').value = 1 + parseInt(document.getElementById('qty_mod_%').value); action_item_update('%', parseInt(document.getElementById('qty_mod_%').value));">+</button>
@@ -110,7 +117,7 @@
         </div>
     </template>
 
-    <nav id="nav">
+    <nav id="nav" style="">
     </nav>
 
     <main id="body">
