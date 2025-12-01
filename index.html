@@ -17,12 +17,16 @@
         <div id="greet"> <h1>Hello %! </h1> </div>
         <div id="box"> <div class="container border border-2"> % </div> </div>
 
+        <!-- SHOPPING PAGE COMPONENTS -->
         <div id="basket-icon"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-basket-fill" viewBox="0 0 16 16">
             <path d="M5.071 1.243a.5.5 0 0 1 .858.514L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 6h1.717zM3.5 10.5a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0z"/>
         </svg> </div>
 
         <div id="modal-checkout-btn">
-            <button type="button" class="btn btn-primary %">Checkout</button>
+            <!-- data-bs-dismiss="modal" -->
+            <p data-bs-dismiss="modal" style="display: contents">
+                <button type="button" class="btn btn-primary %"  onclick="action_checkout_proceed();">Checkout</button>
+            </p>
         </div>
 
         <div id="modal-item">
@@ -47,7 +51,7 @@
                         % <!-- title -->
                     </p>
                     <!-- class="navbar-toggler" -->
-                    <button class="btn" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <button id="basket-modal-btn" class="btn border-0" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         %€ <!-- price -->
                         % <!--  basket card icon  -->
                     </button>
@@ -113,6 +117,14 @@
                         %
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- PREVIEW PAGE COMPONENTS -->
+        <div id="preview-nav">
+            <div class="container align-content-between">
+                <button class="btn" onclick="action_preview_back();"> back </button>
+                <button class="btn"> payment </button>
             </div>
         </div>
     </template>

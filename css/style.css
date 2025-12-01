@@ -24,3 +24,9 @@
     margin-right: auto;
     margin-left: auto;
 }
+
+
+#basket-modal-btn:disabled,
+#basket-modal-btn.disabled {
+    opacity: 1 !important;
+}

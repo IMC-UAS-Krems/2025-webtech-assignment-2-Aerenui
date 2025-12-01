@@ -19,7 +19,11 @@ function afterLoad() {
     // reg.remove();
     importSyntheticComponents();
     populateItems();
-    render_page();
+    general_page_init();
+    if(has_cookie_state())
+        cookie_start();
+    else
+        render_shopping_page();
 }
 
 function importSyntheticComponents() {
@@ -191,6 +195,65 @@ const make_updatable = (id, ...params) => get_component(id).build_with_id(true, 
  * */
 const join = (...items) => items.map((v) => v instanceof BCResult ? v.content : v).join("\n");
 
+
+// ---------------------------------------------------------------------------------------------------------------
+// state save & load
+
+/**
+ * RAW
+ * @param {string} value
+ * */
+function internal_save_state(value) {
+    document.cookie = value;
+}
+
+/**
+ * RAW
+ * @return {string}
+ * */
+function internal_load_state() {
+    return document.cookie;
+}
+
+
+function save_page_state() {
+    const obj = {
+        CURRENT_PAGE: CURRENT_PAGE,
+        ITEMS: [...BASKET_ITEMS.entries()]
+    };
+    const out = JSON.stringify(obj);
+    internal_save_state(out);
+}
+
+function reset_page_state() {
+    // document.cookie += "expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    document.cookie = "";
+}
+
+function load_page_state() {
+    const data = internal_load_state();
+    let obj;
+    try {
+        obj = JSON.parse(data);
+    } catch (e) {
+        console.error("failed to parse cookies");
+        reset_page_state();
+    }
+    CURRENT_PAGE = obj.CURRENT_PAGE;
+    BASKET_ITEMS = new Map(obj.ITEMS);
+
+}
+
+/**
+ * @return {boolean}
+ */
+function has_cookie_state() {
+    return document.cookie.length > 0;
+}
+
+
+
+
 // ---------------------------------------------------------------------------------------------------------------
 // page code
 
@@ -230,7 +293,7 @@ let items_container;
 /**
  * @type {Map<String,Item>}
  * */
-const ITEMS = new Map();
+let ITEMS = new Map();
 function populateItems() {
     let id_cnt = 1;
     const make = (name, description, price, image_url) => {
@@ -261,9 +324,21 @@ let basket_total1;
 let basket_total2;
 let modal_checkout_btn;
 
-// call on initialization
-function render_page() {
+let CURRENT_PAGE = "shopping";
 
+
+/**
+ * @param {boolean} enabled
+ * */
+function basket_modal_set_enabled(enabled) {
+    document.getElementById("basket-modal-btn").disabled = !enabled;
+}
+
+
+/**
+ * items on all pages
+ * */
+function general_page_init() {
     modal_basket = make_updatable("div", "empty");
 
     basktet_cnt = 0;
@@ -275,8 +350,7 @@ function render_page() {
     make("navbar", "Shop", basket_total1, make("basket-icon"))
         .append("nav");
 
-    make("basket-modal", modal_basket, basket_total2, modal_checkout_btn)
-        .append();
+    make("basket-modal", modal_basket, basket_total2, modal_checkout_btn).append();
 
     make("footer")
         .append("foot");
@@ -284,9 +358,13 @@ function render_page() {
     items_container = make_updatable("row-centered", "");
 
     make("items-container", items_container).append();
+}
 
+// call on initialization
+function render_shopping_page() {
+    items_container.rerender("");
 
-    for(const [id, item] of ITEMS) {
+    for(const [_id, item] of ITEMS) {
         items_container.additive_rerender(item.build_component());
     }
 }
@@ -295,7 +373,7 @@ function render_page() {
 /**
  * @type {Map<String, Number>} Map<id, count>
  */
-const BASKET_ITEMS = new Map();
+let BASKET_ITEMS = new Map();
 /**
  * @type {Map<String, BCResult>} Map<id, updatable>
  */
@@ -349,6 +427,7 @@ function action_item_buy(id) {
 
     // update buy button to quantity changer
     ITEMS.get(id).buy_or_modify_holder.rerender(make("items-item-buy-modify", id, id, id, id, id, id, id, id, id, id, id, id));
+    save_page_state();
 }
 
 /**
@@ -365,6 +444,7 @@ function action_item_remove(id) {
     ITEMS.get(id).buy_or_modify_holder.rerender(make("items-item-buy-btn", id));
 
     display_empty_if_basket_empty(1, basktet_cnt);
+    save_page_state();
 }
 
 /**
@@ -376,5 +456,55 @@ function action_item_update(id, qty) {
     BASKET_ITEMS.set(id, qty);
     rerender_basket_price();
     BASKET_MODAL_HANDLES.get(id).rerender(qty === 1 ? "" : qty.toString()+"x", ITEMS.get(id).name, (ITEMS.get(id).price * qty).toString(), id); // component-id="modal-item"
+    save_page_state();
+}
+
+
+function action_checkout_proceed() {
+    CURRENT_PAGE = "preview";
+    basket_modal_set_enabled(false);
+    items_container.rerender("");
+    save_page_state();
+    render_preview_page();
+}
+
+/**
+ * when starting with previous state
+ * */
+function cookie_start(){
+    load_page_state();
+    switch (CURRENT_PAGE) {
+        case "shopping":
+            render_shopping_page();
+            for ([id,cnt] of BASKET_ITEMS.entries()) {
+                action_item_buy(id);
+                if (cnt > 1) {
+                    action_item_update(id, cnt);
+                    document.getElementById("qty_mod_"+id).value = cnt.toString();
+                }
+            }
+            break;
+        case "preview":
+            rerender_basket_price();
+            action_checkout_proceed();
+            render_preview_page();
+            break;
+        default:
+            console.error("invalid page state");
+            break;
+    }
+}
+
+
+function render_preview_page() {
+    items_container.rerender(make("preview-nav"));
+}
+
+function action_preview_back() {
+    CURRENT_PAGE = "shopping";
+    save_page_state();
+    items_container.rerender("");
+    cookie_start();
+    basket_modal_set_enabled(true);
 }
 
