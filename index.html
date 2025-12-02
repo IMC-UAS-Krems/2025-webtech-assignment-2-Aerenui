@@ -52,12 +52,12 @@
                         % <!-- title -->
                     </p>
                     <!-- class="navbar-toggler" -->
-                    <div id="basket-modal-btn" class="btn border-0 d-flex flex-row" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        <div class="pe-1 fs-4">
+                    <button id="basket-modal-btn" class="btn border-0 d-flex flex-row" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <span class="pe-1 fs-5">
                             %€ <!-- price -->
-                        </div>
+                        </span>
                         % <!--  basket card icon  -->
-                    </div>
+                    </button>
         </div> </div> </div>
 
         <div id="basket-modal">
@@ -75,7 +75,7 @@
                         <div class="modal-footer">
                             <div class="container">
                                 <div class="d-flex justify-content-between">
-                                    <div>
+                                    <div class="align-items-center">
                                         total is %€
                                     </div>
                                     <div>
@@ -104,9 +104,9 @@
         <div id="items-item-buy-modify">
             <div class="input-group me-3 ms-3 w-auto">
                 <span class="input-group-text2" style="display: flex; align-items: center">quantity</span>
-                <button class="btn input-group-text" onclick="if (document.getElementById('qty_mod_%').value > 1) { document.getElementById('qty_mod_%').value -= 1; action_item_update('%', parseInt(document.getElementById('qty_mod_%').value)); } else action_item_remove('%');">-</button>
+                <button class="input-group-text btn focus-ring" onclick="if (document.getElementById('qty_mod_%').value > 1) { document.getElementById('qty_mod_%').value -= 1; action_item_update('%', parseInt(document.getElementById('qty_mod_%').value)); } else action_item_remove('%');">-</button>
                 <input id="qty_mod_%" type="number" class="form-control input-number-hide-arrows" aria-label="quantity" value="1" min="1" onchange="if(this.value<1) action_item_remove('%'); else action_item_update('%', parseInt(this.value));">
-                <button class="btn input-group-text" onclick="document.getElementById('qty_mod_%').value = 1 + parseInt(document.getElementById('qty_mod_%').value); action_item_update('%', parseInt(document.getElementById('qty_mod_%').value));">+</button>
+                <button class="input-group-text btn focus-ring" onclick="document.getElementById('qty_mod_%').value = 1 + parseInt(document.getElementById('qty_mod_%').value); action_item_update('%', parseInt(document.getElementById('qty_mod_%').value));">+</button>
             </div>
         </div>
 
@@ -126,17 +126,13 @@
 
         <!-- PREVIEW PAGE COMPONENTS -->
         <div id="preview-nav">
-            <!-- d-flex justify-content-between -->
-            <div class=""> <!-- ps-0 pe-0 -->
+            <div>
                 <button class="btn text-opacity-100 fw-bold border-0 p-0" onclick="action_preview_back();"> <span class="h1">←</span> </button>
-                <!--<div class="align-content-center">
-                    <button class="btn btn-outline-primary h-auto"> payment </button>
-                </div>-->
             </div>
         </div>
 
         <div id="preview-payment-btn">
-            <div><button class="btn btn-primary w-auto"> proceed to payment </button></div>
+            <div><button class="btn btn-primary w-auto" onclick="action_preview_to_payment();"> proceed to payment </button></div>
         </div>
 
         <div id="preview-table-holder">
@@ -169,6 +165,69 @@
                 </tr>
             </tbody>
         </table>
+
+        <!-- PAYMENT PAGE COMPONENTS -->
+        <div id="payment-nav">
+            <div>
+                <button class="btn text-opacity-100 fw-bold border-0 p-0" onclick="action_payment_back();"> <span class="h1">←</span> </button>
+            </div>
+        </div>
+
+
+        <div id="payment-contactform">
+            <div class="container" style="max-width: 800px">
+                <form id="contactForm" class="w-auto">
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="nameAndSurname" type="text" placeholder="Name and surname" />
+                        <label for="nameAndSurname">Name and surname</label>
+                        <div class="invalid-feedback" data-sb-feedback="nameAndSurname:required">Name and surname is required.</div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="emailAddress" type="email" placeholder="Email Address" />
+                        <label for="emailAddress">Email Address</label>
+                        <div class="invalid-feedback" data-sb-feedback="emailAddress:required">Email Address is required.</div>
+                        <div class="invalid-feedback" data-sb-feedback="emailAddress:email">Email Address Email is not valid.</div>
+                    </div>
+
+                    <!--<div class="form-floating mb-3 border border-1">
+                        <input class="form-switch mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
+&lt;!&ndash;                        <input type="text" class="form-control" aria-label="Text input with checkbox">&ndash;&gt;
+
+                        <div class="form-control-plaintext">
+                            Agree to receive latest emails.
+                        </div>
+                    </div>-->
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" checked id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Subscribe to newsletter
+                        </label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="message" type="text" placeholder="Message" style="height: 10rem;" ></textarea>
+                        <label for="message">Message</label>
+                        <div class="invalid-feedback" data-sb-feedback="message:required">Message is required.</div>
+                    </div>
+
+
+                    <div class="d-none" id="submitSuccessMessage">
+                        <div class="text-center mb-3">
+                            <div class="fw-bolder">Form submission successful!</div>
+                        </div>
+                    </div>
+                    <div class="d-none" id="submitErrorMessage">
+                        <div class="text-center text-danger mb-3">Error sending message!</div>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-primary btn-lg disabled" id="submitButton" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
     </template>
 
     <div style="display: flex; flex-direction: column; min-height: 100vh">

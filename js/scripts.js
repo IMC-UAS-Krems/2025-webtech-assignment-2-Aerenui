@@ -28,6 +28,50 @@ function afterLoad() {
     importSyntheticComponents();
     populateItems();
     general_page_init();
+    window.onhashchange = (e) => {
+        const new_hash = window.location.hash;
+
+        switch (new_hash) {
+            case "#shop":
+                if(CURRENT_PAGE === "shopping") break
+                if (CURRENT_PAGE === "preview" || CURRENT_PAGE === "payment") {
+                  action_preview_back();
+                }
+                break
+            case "#preview":
+                if(CURRENT_PAGE === "preview") break;
+                if (CURRENT_PAGE === "shopping") {
+                    if (basktet_cnt > 0) {
+                        action_checkout_proceed();
+                    } else {
+                        e.preventDefault(); // does not work for some unknown reason
+                        // history.pushState(null, null, "#shop"); // fix for preventDefault not working
+                        window.location.hash = "shop";
+                    }
+                }
+                if(CURRENT_PAGE === "payment") {
+                  action_payment_back();
+                }
+                break
+            case "#payment":
+                if(CURRENT_PAGE === "payment") break;
+                if(CURRENT_PAGE === "preview") {
+                    action_preview_to_payment();
+                    break;
+                }
+                if(CURRENT_PAGE === "shopping") {
+                    if (basktet_cnt > 0) {
+                        action_preview_to_payment();
+                    } else {
+                        e.preventDefault(); // does not work for some unknown reason
+                        // history.pushState(null, null, "#shop"); // fix for preventDefault not working
+                        window.location.hash = "shop";
+                    }
+                }
+                console.error("unknown page '"+CURRENT_PAGE+"'");
+                break
+        }
+    };
     if(has_cookie_state())
         cookie_start();
     else
@@ -343,6 +387,13 @@ let CURRENT_PAGE = "shopping";
  * */
 function basket_modal_set_enabled(enabled) {
     document.getElementById("basket-modal-btn").disabled = !enabled;
+    if (!enabled) {
+        // document.getElementById("basket-modal-btn").setAttribute("disabled", "disabled");
+        // document.getElementById("basket-modal-btn").attributes.setNamedItem("disabled");
+    } else {
+        // document.getElementById("basket-modal-btn").removeAttribute("disabled");
+    }
+
 }
 
 
@@ -375,6 +426,7 @@ function general_page_init() {
 function render_shopping_page() {
     // window.history.replaceState("","", "/shop");
     window.location.hash = "shop";
+    window.scrollTo(0,0);
 
     items_container.rerender("");
 
@@ -427,7 +479,7 @@ function display_empty_if_basket_empty(old_price, new_price) {
  * @param {String} id
  * */
 function action_item_buy(id) {
-    console.log("called action_item_buy with id='"+id+"'");
+    // console.log("called action_item_buy with id='"+id+"'");
     display_empty_if_basket_empty(basktet_cnt,1);
 
     BASKET_ITEMS.set(id, 1);
@@ -448,7 +500,7 @@ function action_item_buy(id) {
  * @param {String} id
  * */
 function action_item_remove(id) {
-    console.log("called action_item_remove with id='"+id+"'");
+    // console.log("called action_item_remove with id='"+id+"'");
     BASKET_ITEMS.delete(id);
     if(BASKET_MODAL_HANDLES.has(id)) {
         BASKET_MODAL_HANDLES.get(id).remove();
@@ -466,7 +518,7 @@ function action_item_remove(id) {
  * @param {number} qty
  * */
 function action_item_update(id, qty) {
-    console.log("called action_item_update with id='"+id+"', qty="+qty.toString());
+    // console.log("called action_item_update with id='"+id+"', qty="+qty.toString());
     BASKET_ITEMS.set(id, qty);
     rerender_basket_price();
     BASKET_MODAL_HANDLES.get(id).rerender(qty === 1 ? "" : qty.toString()+"x", ITEMS.get(id).name, (ITEMS.get(id).price * qty).toString(), id); // component-id="modal-item"
@@ -476,19 +528,29 @@ function action_item_update(id, qty) {
 
 function action_checkout_proceed() {
     CURRENT_PAGE = "preview";
+    window.location.hash = "preview";
     basket_modal_set_enabled(false);
     items_container.rerender("");
     save_page_state();
     render_preview_page();
+    window.scrollTo(0,0);
 }
 
 /**
  * when starting with previous state
  * */
-function cookie_start(){
-    load_page_state();
+function cookie_start(load_state=true){
+    if(load_state)
+        load_page_state();
+
+
     switch (CURRENT_PAGE) {
         case "shopping":
+            if(window.location.hash === "#preview" || window.location.hash === "#payment") {
+                CURRENT_PAGE = "preview";
+                cookie_start(false);
+                return;
+            }
             render_shopping_page();
             const basket_copy = new Map(BASKET_ITEMS.entries());
             BASKET_ITEMS.clear();
@@ -502,9 +564,35 @@ function cookie_start(){
             }
             break;
         case "preview":
+            if(window.location.hash === "#shop") {
+                CURRENT_PAGE = "shopping";
+                cookie_start(false);
+                return;
+            }
+            if(window.location.hash === "#payment"){
+                CURRENT_PAGE = "payment";
+                cookie_start(false);
+                return;
+            }
             rerender_basket_price();
             action_checkout_proceed(); // calls render_preview_page();
+            basket_modal_set_enabled(false);
             // render_preview_page();
+            break
+        case "payment":
+            if(window.location.hash === "#preview") {
+                CURRENT_PAGE = "preview";
+                cookie_start(false);
+                return;
+            }
+            if(window.location.hash === "#shop") {
+                CURRENT_PAGE = "shopping";
+                cookie_start(false);
+                return;
+            }
+            rerender_basket_price();
+            render_payment_page();
+            basket_modal_set_enabled(false);
             break;
         default:
             console.error("invalid page state");
@@ -516,6 +604,9 @@ function cookie_start(){
 function render_preview_page() {
     // window.history.replaceState("","", "/preview");
     window.location.hash = "preview";
+    window.scrollTo(0,0);
+
+    basket_modal_set_enabled(false);
 
     const items = BASKET_ITEMS
         .entries()
@@ -534,9 +625,38 @@ function render_preview_page() {
 
 function action_preview_back() {
     CURRENT_PAGE = "shopping";
+    window.location.hash = "shop";
     save_page_state();
     items_container.rerender("");
     cookie_start();
     basket_modal_set_enabled(true);
+    window.scrollTo(0,0);
 }
 
+function action_preview_to_payment() {
+    CURRENT_PAGE = "payment";
+    window.location.hash = "payment";
+    save_page_state();
+    items_container.rerender("");
+    cookie_start();
+    basket_modal_set_enabled(false);
+    window.scrollTo(0,0);
+}
+
+function render_payment_page() {
+    window.location.hash = "payment";
+    basket_modal_set_enabled(false);
+    window.scrollTo(0,0);
+
+    items_container.rerender(join(make("payment-nav"), make("div",make("payment-contactform"))));
+}
+
+function action_payment_back() {
+    CURRENT_PAGE = "preview";
+    window.location.hash = "preview";
+    save_page_state();
+    items_container.rerender("");
+    cookie_start();
+    basket_modal_set_enabled(false);
+    window.scrollTo(0,0);
+}
