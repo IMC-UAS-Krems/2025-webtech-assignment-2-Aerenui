@@ -18,14 +18,6 @@
 }
 
 
-/* SOURCE: https://stackoverflow.com/questions/29128960/how-to-precisely-center-bootstrap-grid-in-html-page */
-.col-centered {
-    float: none;
-    margin-right: auto;
-    margin-left: auto;
-}
-
-
 #basket-modal-btn:disabled,
 #basket-modal-btn.disabled {
     opacity: 1 !important;

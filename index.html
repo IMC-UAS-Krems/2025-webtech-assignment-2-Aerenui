@@ -13,12 +13,13 @@
 <body>
 <!-- <div  id="components" style="display: none"> -->
     <template>
+        <!-- BASIC COMPONENTS -->
         <div id="container"> <div class="container"> % </div> </div>
         <div id="greet"> <h1>Hello %! </h1> </div>
         <div id="box"> <div class="container border border-2"> % </div> </div>
 
         <!-- SHOPPING PAGE COMPONENTS -->
-        <div id="basket-icon"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-basket-fill" viewBox="0 0 16 16">
+        <div id="basket-icon"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-basket-fill" viewBox="0 0 16 16">
             <path d="M5.071 1.243a.5.5 0 0 1 .858.514L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 6h1.717zM3.5 10.5a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0z"/>
         </svg> </div>
 
@@ -47,14 +48,16 @@
         <div id="navbar">
             <div class="navbar sticky-top bg-body-tertiary">
                 <div class="container-fluid">
-                    <p class="navbar-brand" href="">
+                    <p class="navbar-brand fs-1 pb-0 mb-0" href="">
                         % <!-- title -->
                     </p>
                     <!-- class="navbar-toggler" -->
-                    <button id="basket-modal-btn" class="btn border-0" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        %€ <!-- price -->
+                    <div id="basket-modal-btn" class="btn border-0 d-flex flex-row" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <div class="pe-1 fs-4">
+                            %€ <!-- price -->
+                        </div>
                         % <!--  basket card icon  -->
-                    </button>
+                    </div>
         </div> </div> </div>
 
         <div id="basket-modal">
@@ -88,7 +91,8 @@
         </div>
 
         <div id="items-container">
-            <div class="container p-2 mx-auto">
+<!--            <div class="container p-2 mx-auto d-inline-flex justify-content-center w-auto">-->
+            <div class="container p-2">
                 %
             </div>
         </div>
@@ -122,20 +126,64 @@
 
         <!-- PREVIEW PAGE COMPONENTS -->
         <div id="preview-nav">
-            <div class="container align-content-between">
-                <button class="btn" onclick="action_preview_back();"> back </button>
-                <button class="btn"> payment </button>
+            <!-- d-flex justify-content-between -->
+            <div class=""> <!-- ps-0 pe-0 -->
+                <button class="btn text-opacity-100 fw-bold border-0 p-0" onclick="action_preview_back();"> <span class="h1">←</span> </button>
+                <!--<div class="align-content-center">
+                    <button class="btn btn-outline-primary h-auto"> payment </button>
+                </div>-->
             </div>
         </div>
+
+        <div id="preview-payment-btn">
+            <div><button class="btn btn-primary w-auto"> proceed to payment </button></div>
+        </div>
+
+        <div id="preview-table-holder">
+            <div class="ps-3 pe-3 w-100">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Item</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                    <!-- % -->
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+        <table id="preview-table-item" skip="tbody">
+            <tbody>
+                <tr>
+<!--                    <th scope="row"> </th>-->
+                    <td>%</td>
+                    <td>%</td>
+                    <td>%</td>
+                    <td>%€</td>
+                </tr>
+            </tbody>
+        </table>
     </template>
 
-    <nav id="nav" style="">
-    </nav>
+    <div style="display: flex; flex-direction: column; min-height: 100vh">
+        <div>
+            <nav id="nav" class="sticky-top">
+            </nav>
 
-    <main id="body">
-    </main>
+            <main id="body" class="">
+            </main>
+        </div>
 
-    <footer id="foot">
+        <div class="flex-grow-1 invisible"></div>
+    </div>
+    <footer id="foot" class="">
+
     </footer>
 
     <script src="js/scripts.js"></script>

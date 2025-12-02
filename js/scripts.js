@@ -14,9 +14,17 @@ function afterLoad() {
     // const reg = document.getElementById("components");
     const reg = document.getElementsByTagName("template")[0].content;
     for (const e of reg.children) {
-        COMPONENT_REGISTRY.push(new Component(e.id, false, e.innerHTML));
+        let content = e.innerHTML;
+        // console.log("DBG: component init: e.tag = '"+e.tagName+"', e.child.0.tag = '"+(e.children[0] === null ? "null" : e.children[0].tagName)+"', skipAttr='"+ e.getAttribute("skip")+"'");
+        if(e.getAttribute("skip") === e.children[0].tagName.toLowerCase()) {
+            content = e.children[0].innerHTML;
+            // console.log("special component");
+            // console.log(content);
+        }
+        COMPONENT_REGISTRY.push(new Component(e.id, false, content));
     }
-    // reg.remove();
+
+
     importSyntheticComponents();
     populateItems();
     general_page_init();
@@ -35,7 +43,10 @@ function importSyntheticComponents() {
     make_component("span", "<span> % </span>");
     make_component("a", "<a href=\"%\"> % </a>");
     make_component("row", "<div class='row'> % </div>");
-    make_component("row-centered", "<div class='row col-centered'> % </div>"); // col-centered
+    make_component("row-centered", "<div class='row justify-content-center'> % </div>");
+    make_component("br", "<div class='w-100 invisible'>empty divider</div>");
+    make_component("title", "<h1 class='h1'>%</h1>");
+    make_component("h3", "<h3 class='h3'>%</h3>")
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -362,6 +373,9 @@ function general_page_init() {
 
 // call on initialization
 function render_shopping_page() {
+    // window.history.replaceState("","", "/shop");
+    window.location.hash = "shop";
+
     items_container.rerender("");
 
     for(const [_id, item] of ITEMS) {
@@ -476,7 +490,10 @@ function cookie_start(){
     switch (CURRENT_PAGE) {
         case "shopping":
             render_shopping_page();
-            for ([id,cnt] of BASKET_ITEMS.entries()) {
+            const basket_copy = new Map(BASKET_ITEMS.entries());
+            BASKET_ITEMS.clear();
+            rerender_basket_price();
+            for ([id,cnt] of basket_copy.entries()) {
                 action_item_buy(id);
                 if (cnt > 1) {
                     action_item_update(id, cnt);
@@ -486,8 +503,8 @@ function cookie_start(){
             break;
         case "preview":
             rerender_basket_price();
-            action_checkout_proceed();
-            render_preview_page();
+            action_checkout_proceed(); // calls render_preview_page();
+            // render_preview_page();
             break;
         default:
             console.error("invalid page state");
@@ -497,7 +514,22 @@ function cookie_start(){
 
 
 function render_preview_page() {
-    items_container.rerender(make("preview-nav"));
+    // window.history.replaceState("","", "/preview");
+    window.location.hash = "preview";
+
+    const items = BASKET_ITEMS
+        .entries()
+        .map(([id, cnt]) => make("preview-table-item", ITEMS.get(id).name, ITEMS.get(id).description, cnt.toString(), (ITEMS.get(id).price * cnt).toString()))
+        .reduce((a,b) => a+b.content+"\n", "");
+
+    // the comment parts are a fix to prevent browser from removing template argument marker
+    const table = make("preview-table-holder",
+        "-->"+items+"<!--"
+    );
+
+    const summary = join(make("h3", "total is "+basktet_cnt.toString() + "€"), make("preview-payment-btn"));
+
+    items_container.rerender(join(make("preview-nav"), make("br"), make("title", "Your order"), table, summary));
 }
 
 function action_preview_back() {
