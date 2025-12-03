@@ -176,31 +176,24 @@
 
         <div id="payment-contactform">
             <div class="container" style="max-width: 800px">
-                <form id="contactForm" class="w-auto">
+                <!-- SOURCE for js calling on form submit: https://stackoverflow.com/questions/10520899/form-action-with-javascript -->
+                <form id="contactForm" class="w-auto" action="javascript:action_payment_proceed();" onsubmit="return action_payment_submit(this);">
                     <div class="form-floating mb-3">
-                        <input class="form-control" id="nameAndSurname" type="text" placeholder="Name and surname" />
-                        <label for="nameAndSurname">Name and surname</label>
-                        <div class="invalid-feedback" data-sb-feedback="nameAndSurname:required">Name and surname is required.</div>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input class="form-control" id="emailAddress" type="email" placeholder="Email Address" />
-                        <label for="emailAddress">Email Address</label>
-                        <div class="invalid-feedback" data-sb-feedback="emailAddress:required">Email Address is required.</div>
-                        <div class="invalid-feedback" data-sb-feedback="emailAddress:email">Email Address Email is not valid.</div>
-                    </div>
-
-                    <!--<div class="form-floating mb-3 border border-1">
-                        <input class="form-switch mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
-&lt;!&ndash;                        <input type="text" class="form-control" aria-label="Text input with checkbox">&ndash;&gt;
-
-                        <div class="form-control-plaintext">
-                            Agree to receive latest emails.
+                        <input class="form-control" id="form-name-surname" oninput="form_validate_name_and_surname(this)" required type="text" placeholder="Name and surname" />
+                        <label for="form-name-surname">Name and surname</label>
+                        <div class="valid-feedback">
+                            Looks good!
                         </div>
-                    </div>-->
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="form-email" type="email" oninput="form_validate_email(this);" required placeholder="Email Address" />
+                        <label for="form-email">Email Address</label>
+                    </div>
+
                     <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" checked id="flexCheckDefault">
-                        <label class="form-check-label" for="flexCheckDefault">
+                        <input class="form-check-input" type="checkbox" checked id="form-newsletter">
+                        <label class="form-check-label" for="form-newsletter">
                             Subscribe to newsletter
                         </label>
                     </div>
@@ -208,24 +201,16 @@
                     <div class="form-floating mb-3">
                         <textarea class="form-control" id="message" type="text" placeholder="Message" style="height: 10rem;" ></textarea>
                         <label for="message">Message</label>
-                        <div class="invalid-feedback" data-sb-feedback="message:required">Message is required.</div>
                     </div>
 
-
-                    <div class="d-none" id="submitSuccessMessage">
-                        <div class="text-center mb-3">
-                            <div class="fw-bolder">Form submission successful!</div>
-                        </div>
-                    </div>
-                    <div class="d-none" id="submitErrorMessage">
-                        <div class="text-center text-danger mb-3">Error sending message!</div>
-                    </div>
                     <div class="d-grid">
-                        <button class="btn btn-primary btn-lg disabled" id="submitButton" type="submit">Submit</button>
+                        <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Submit</button>
                     </div>
                 </form>
             </div>
         </div>
+
+        <!-- THANKS PAGE COMPONENTS -->
 
 
     </template>

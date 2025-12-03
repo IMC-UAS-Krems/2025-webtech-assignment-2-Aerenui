@@ -34,7 +34,7 @@ function afterLoad() {
         switch (new_hash) {
             case "#shop":
                 if(CURRENT_PAGE === "shopping") break
-                if (CURRENT_PAGE === "preview" || CURRENT_PAGE === "payment") {
+                if (CURRENT_PAGE === "preview" || CURRENT_PAGE === "payment" || CURRENT_PAGE === "thanks") {
                   action_preview_back();
                 }
                 break
@@ -69,6 +69,10 @@ function afterLoad() {
                     }
                 }
                 console.error("unknown page '"+CURRENT_PAGE+"'");
+                break
+            case "#thanks":
+                if(CURRENT_PAGE !== "thanks")
+                    action_preview_back();
                 break
         }
     };
@@ -543,6 +547,7 @@ function cookie_start(load_state=true){
     if(load_state)
         load_page_state();
 
+    document.getElementById("basket-modal-btn").classList.remove("hide");
 
     switch (CURRENT_PAGE) {
         case "shopping":
@@ -592,6 +597,15 @@ function cookie_start(load_state=true){
             }
             rerender_basket_price();
             render_payment_page();
+            basket_modal_set_enabled(false);
+            break
+        case "thanks":
+            if(window.location.hash === "#shop") {
+                CURRENT_PAGE = "shopping";
+                cookie_start(false);
+                return;
+            }
+            render_thanks_page();
             basket_modal_set_enabled(false);
             break;
         default:
@@ -659,4 +673,89 @@ function action_payment_back() {
     cookie_start();
     basket_modal_set_enabled(false);
     window.scrollTo(0,0);
+}
+
+/**
+ * @type {Set<string>}
+ * */
+const WAS_EVER_FULL_FORM_VALIDATION = new Set();
+/**
+ * @param {HTMLInputElement} input_element
+ * */
+function form_validate_email(input_element) {
+    const value = input_element.value;
+
+    if((value.length === 0 && WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id)) || value.indexOf('@') === -1 || value.indexOf('.') === -1) {
+        input_element.classList.add("is-invalid");
+    } else {
+        input_element.classList.remove("is-invalid");
+    }
+
+    if(!WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id) && value.length > 0) {
+        WAS_EVER_FULL_FORM_VALIDATION.add(input_element.id);
+    }
+}
+
+/**
+ * @param {HTMLInputElement} input_element
+ */
+function form_validate_name_and_surname(input_element) {
+    const value = input_element.value.trim();
+    if ((value.length === 0 && WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id)) || value.indexOf(' ') === -1) {
+        input_element.classList.add("is-invalid");
+    } else {
+        input_element.classList.remove("is-invalid");
+    }
+
+    if(!WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id) && value.length > 0) {
+        WAS_EVER_FULL_FORM_VALIDATION.add(input_element.id);
+    }
+}
+
+/**
+ * @param {string} input_ids
+ * */
+function form_verify(...input_ids) {
+    return !input_ids.map((id) => document.getElementById(id).classList.contains("is-invalid")).reduce((a, b) => a || b);
+}
+
+/**
+ * @param {HTMLFormElement} form
+ * */
+function action_payment_submit(form) {
+    return form_verify(...Array.from(form.getElementsByTagName("input")).map((e) => e.id));
+}
+
+function action_payment_proceed(verify=true) {
+    if (verify && !action_payment_submit(document.getElementById("contactForm"))) {
+        return;
+    }
+
+    CURRENT_PAGE = "thanks";
+    window.location.hash = "thanks";
+    save_page_state();
+    items_container.rerender("");
+    cookie_start();
+    basket_modal_set_enabled(false);
+    window.scrollTo(0,0);
+}
+
+function render_thanks_page() {
+    window.location.hash = "thanks";
+
+    // prevent basket from being full in any case
+    BASKET_ITEMS.clear();
+    save_page_state();
+
+    // hide basket
+    document.getElementById("basket-modal-btn").classList.add("hide");
+
+    items_container.rerender("<h2> thanks, " + "Joseph" + " </h2> <br> <button class='btn btn-primary' onclick='action_thanks_back_to_shop();'>back to shop</button>");
+}
+
+function action_thanks_back_to_shop() {
+    BASKET_ITEMS.clear();
+    save_page_state();
+    window.location.hash = "#shop";
+
 }
