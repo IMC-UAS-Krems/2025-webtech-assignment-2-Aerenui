@@ -679,13 +679,122 @@ function action_payment_back() {
  * @type {Set<string>}
  * */
 const WAS_EVER_FULL_FORM_VALIDATION = new Set();
+
+
+
+/**
+ * @param {HTMLInputElement} input_element
+ * */
+function form_validate_cardname(input_element) {
+    if((input_element.value.length === 0 && WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id))) {
+        input_element.classList.add("is-invalid");
+    } else {
+        input_element.classList.remove("is-invalid");
+    }
+
+    if(!WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id) && input_element.value.length > 0) {
+        WAS_EVER_FULL_FORM_VALIDATION.add(input_element.id);
+    }
+}
+
+/**
+ * @param {HTMLInputElement} input_element
+ * */
+function form_validate_cardnumber(input_element) {
+    // let new_value = input_element.value.trim().replace(/\D/g,'');
+    if ((input_element.value.length === 0 && WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id)) || input_element.value.length < 7 /*|| new_value.length !== input_element.value.trim().length*/) {
+        input_element.classList.add("is-invalid");
+    } else {
+        input_element.classList.remove("is-invalid");
+    }
+
+    if(!WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id) && input_element.value.length > 0) {
+        WAS_EVER_FULL_FORM_VALIDATION.add(input_element.id);
+    }
+}
+
+/**
+ * @type {Map<string, boolean>}
+ * */
+const CARDEXPIRE_VALIDATE_REG = new Map();
+
+/**
+ * @param {HTMLInputElement} input_element
+ * */
+function form_validate_cardexire(input_element) {
+    const value = input_element.value;
+
+    let switch_v = true;
+    if(CARDEXPIRE_VALIDATE_REG.has(input_element.id)) {
+        switch_v = CARDEXPIRE_VALIDATE_REG.get(input_element.id);
+    }
+
+    // console.log("switch = '"+switch_v.toString()+"'");
+
+    if(value.length === 2) {
+        if (switch_v) {
+            input_element.value = value + "/";
+        }
+        CARDEXPIRE_VALIDATE_REG.set(input_element.id, !switch_v);
+    } else if (value.length === 3) {
+        if(value[2] !== '/'){
+            input_element.value = value[0].toString() + value[1] + '/' + value[2];
+        }
+    }
+
+    // validation
+
+    if((input_element.value.length === 0 && WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id)) || value.length !== 5 ||
+        (value.length === 5 && (
+            "01".indexOf(value[0]) === -1 ||
+            "0123456789".indexOf(value[1]) === -1 ||
+            value[2] !== '/' ||
+            "0123456789".indexOf(value[3]) === -1 ||
+            "0123456789".indexOf(value[4]) === -1 ||
+            (value[0] === '1' && "012".indexOf(value[1]) === -1)
+        ))) {
+
+        input_element.classList.add("is-invalid");
+    } else {
+        input_element.classList.remove("is-invalid");
+    }
+
+    if(!WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id) && input_element.value.length > 0) {
+        WAS_EVER_FULL_FORM_VALIDATION.add(input_element.id);
+    }
+
+}
+
+
+/**
+ * @param {HTMLInputElement} input_element
+ * */
+function form_validate_cardcvv(input_element) {
+    const value = input_element.value;
+    if (value.length > 3) {
+        input_element.value = value.substring(0, 3);
+    }
+
+    if((input_element.value.length === 0 && WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id)) || input_element.value.length !== 3) {
+        input_element.classList.add("is-invalid");
+    } else {
+        input_element.classList.remove("is-invalid");
+    }
+
+    if(!WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id) && input_element.value.length > 0) {
+        WAS_EVER_FULL_FORM_VALIDATION.add(input_element.id);
+    }
+}
+
+
+
 /**
  * @param {HTMLInputElement} input_element
  * */
 function form_validate_email(input_element) {
     const value = input_element.value;
 
-    if((value.length === 0 && WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id)) || value.indexOf('@') === -1 || value.indexOf('.') === -1) {
+    if((value.length === 0 && WAS_EVER_FULL_FORM_VALIDATION.has(input_element.id)) || value.indexOf('@') === -1 || value.indexOf('.') === -1 || value.indexOf('.') === value.length-1) {
         input_element.classList.add("is-invalid");
     } else {
         input_element.classList.remove("is-invalid");

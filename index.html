@@ -178,17 +178,59 @@
             <div class="container" style="max-width: 800px">
                 <!-- SOURCE for js calling on form submit: https://stackoverflow.com/questions/10520899/form-action-with-javascript -->
                 <form id="contactForm" class="w-auto" action="javascript:action_payment_proceed();" onsubmit="return action_payment_submit(this);">
+                    <div class="form-text">
+                        <h2 class="fs-3"> Payment information </h2>
+                    </div>
+                    <!-- CARDHOLDER'S NAME; CARD NUMBER; EXPIRY DATE; CVV; total = X -->
+
                     <div class="form-floating mb-3">
-                        <input class="form-control" id="form-name-surname" oninput="form_validate_name_and_surname(this)" required type="text" placeholder="Name and surname" />
-                        <label for="form-name-surname">Name and surname</label>
-                        <div class="valid-feedback">
-                            Looks good!
+                        <input class="form-control" id="form-card-name" oninput="form_validate_cardname(this)" required type="text" placeholder="cardholder's name">
+                        <label for="form-card-name">cardholder's name</label>
+                        <div class="invalid-tooltip">
+                            Doesn't look like a name.
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input class="form-control input-number-hide-arrows" id="form-card-number" autocomplete="cc-number" oninput="form_validate_cardnumber(this)" required type="text" maxlength="19" placeholder="xxxx xxxx xxxx xxxx">
+                        <label for="form-card-number">card number</label>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="form-floating me-2">
+                            <input class="form-control input-number-hide-arrows" id="form-card-expiry" inputmode="numerical" maxlength="5" oninput="form_validate_cardexire(this)" required placeholder="123">
+                            <label for="form-card-expiry">expiry date</label>
+                            <div class="invalid-tooltip">
+                                Invalid expiry date. Use format MM/YY.
+                            </div>
+                        </div>
+                        <div class="form-floating">
+                            <input class="form-control input-number-hide-arrows" id="form-card-cvv" type="number" minlength="3" oninput="form_validate_cardcvv(this)" required placeholder="123">
+                            <label for="form-card-cvv">CVV</label>
+                            <div class="invalid-tooltip">
+                                Invalid CVV.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-text">
+                        <h2 class="fs-3"> Contact information </h2>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="form-name-surname" oninput="form_validate_name_and_surname(this)" required type="text" placeholder="Name and Surname" />
+                        <label for="form-name-surname">Name and Surname</label>
+                        <div class="invalid-tooltip">
+                            Invalid or empty name and surname.
                         </div>
                     </div>
 
                     <div class="form-floating mb-3">
                         <input class="form-control" id="form-email" type="email" oninput="form_validate_email(this);" required placeholder="Email Address" />
                         <label for="form-email">Email Address</label>
+                        <div class="invalid-tooltip">
+                            Invalid or empty email.
+                        </div>
                     </div>
 
                     <div class="form-check mb-3">
@@ -204,7 +246,7 @@
                     </div>
 
                     <div class="d-grid">
-                        <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Submit</button>
+                        <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Pay and finish order</button>
                     </div>
                 </form>
             </div>
