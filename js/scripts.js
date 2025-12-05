@@ -1,3 +1,5 @@
+// import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js";
+
 // internal globals
 /**
  * @type {Component[]}
@@ -662,7 +664,7 @@ function render_payment_page() {
     basket_modal_set_enabled(false);
     window.scrollTo(0,0);
 
-    items_container.rerender(join(make("payment-nav"), make("div",make("payment-contactform"))));
+    items_container.rerender(join(make("payment-nav"), make("div", make("payment-contactform")), make("payment-wait-modal")));
 }
 
 function action_payment_back() {
@@ -833,6 +835,28 @@ function form_verify(...input_ids) {
  * */
 function action_payment_submit(form) {
     return form_verify(...Array.from(form.getElementsByTagName("input")).map((e) => e.id));
+}
+
+/**
+ * @type {bootstrap.Modal}
+ * */
+let PAYMENT_WAIT_MODAL;
+function action_payment_proceed_trigger() {
+    if (!action_payment_submit(document.getElementById("contactForm"))) {
+        return;
+    }
+
+    PAYMENT_WAIT_MODAL = new bootstrap.Modal(document.getElementById("paymentWaitModal"), {
+        keyboard: false, backdrop: "static"
+    });
+    PAYMENT_WAIT_MODAL.show();
+
+
+     setTimeout(() => {
+         PAYMENT_WAIT_MODAL.hide();
+         document.getElementById("paymentWaitModal").remove();
+         action_payment_proceed();
+     }, 2000);
 }
 
 function action_payment_proceed(verify=true) {

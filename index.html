@@ -177,7 +177,7 @@
         <div id="payment-contactform">
             <div class="container" style="max-width: 800px">
                 <!-- SOURCE for js calling on form submit: https://stackoverflow.com/questions/10520899/form-action-with-javascript -->
-                <form id="contactForm" class="w-auto" action="javascript:action_payment_proceed();" onsubmit="return action_payment_submit(this);">
+                <form id="contactForm" class="w-auto" action="javascript:action_payment_proceed_trigger();" onsubmit="return action_payment_submit(this);">
                     <div class="form-text">
                         <h2 class="fs-3"> Payment information </h2>
                     </div>
@@ -249,6 +249,26 @@
                         <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Pay and finish order</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <div id="payment-wait-modal">
+            <!-- Modal -->
+            <div class="modal fade" id="paymentWaitModal" tabindex="-1" aria-labelledby="paymentWaitModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="paymentWaitModalLabel">Processing payment</h1>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-center">
+                            <div class="spinner-border" role="status" style="width: 4rem; height: 4rem;">
+                                <span class="visually-hidden">Processing...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
             </div>
         </div>
 
