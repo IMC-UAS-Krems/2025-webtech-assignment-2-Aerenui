@@ -1,4 +1,4 @@
-// import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js";
+
 
 // internal globals
 /**
@@ -362,27 +362,58 @@ function populateItems() {
         id_cnt++;
     };
 
-    make("Base Item", "description", 10, "/img/cat.png");
+    /*make("Base Item", "description", 10, "/img/cat.png");
     for(let i=1;i<15;i++) {
         make("Item "+i.toString(), "description of item "+i.toString(), 2**i, "/img/cat.png");
     }
-
     make("Martin", "mr", 10000, "/img/cat.png");
+    */
+
+    const names = [
+        "Luna", "Oliver", "Bella", "Milo", "Whiskers", "Shadow", "Simba", "Nala", "Leo", "Chloe", "Jasper", "Lucy", // used
+        "Charlie", "Kitty", "Felix", "Mittens", "Oreo", "Pumpkin", "Smokey", "Tiger"
+    ];
+
+    for(let i=1;i<11+1; i++) {
+        make(names[i], "description", 5*i*i-3*i+4, "/img/cat"+i.toString()+".jpg");
+    }
+
 }
 
 
 
 
-
+const TAX_PERCENTAGE = 0.2; // 20%
+const DISCOUNT_PERCENTAGE = 0.1; // 10%
 let basktet_cnt;
 
 /**
  * @type {BCResult}
  * */
 let modal_basket;
-
+/**
+ * @type {BCResult}
+ * */
 let basket_total1;
+/**
+ * @type {BCResult}
+ * */
 let basket_total2;
+/**
+ * @type {BCResult}
+ * */
+let basket_discount;
+/**
+ * @type {BCResult}
+ * */
+let basket_discount_value;
+/**
+ * @type {BCResult}
+ * */
+let basket_tax;
+/**
+ * @type {BCResult}
+ * */
 let modal_checkout_btn;
 
 let CURRENT_PAGE = "shopping";
@@ -413,12 +444,18 @@ function general_page_init() {
 
     basket_total1 = make_updatable("span", basktet_cnt.toString());
     basket_total2 = make_updatable("span", basktet_cnt.toString());
+
+    basket_discount_value = make_updatable("span", "0");
+    basket_discount = make_updatable("div", join("Discount("+(DISCOUNT_PERCENTAGE*100).toFixed(0)+"%) is ", basket_discount_value, "€"));
+    basket_tax = make_updatable("span", "0");
+
     modal_checkout_btn = make_updatable("modal-checkout-btn", "disabled");
 
     make("navbar", "Shop", basket_total1, make("basket-icon"))
         .append("nav");
 
-    make("basket-modal", modal_basket, basket_total2, modal_checkout_btn).append();
+    make("basket-modal", modal_basket, basket_discount, basket_tax, basket_total2, modal_checkout_btn).append();
+    rerender_basket_price();
 
     make("footer")
         .append("foot");
@@ -434,7 +471,7 @@ function render_shopping_page() {
     window.location.hash = "shop";
     window.scrollTo(0,0);
 
-    items_container.rerender("");
+    items_container.rerender(make("shop-title"));
 
     for(const [_id, item] of ITEMS) {
         items_container.additive_rerender(item.build_component());
@@ -457,17 +494,28 @@ const BASKET_MODAL_HANDLES = new Map();
  * @return {number}
  */
 const calc_price = () => BASKET_ITEMS.entries().map(([k, v]) => ITEMS.get(k).price * v).reduce((p, c) => p + c, 0);
+const calc_items_cnt = () => BASKET_ITEMS.entries().map(([_, v]) => v).reduce((i, v) => i+v, 0);
 
+/// update price on the page
 function rerender_basket_price() {
-    // update price
-    const price = calc_price();
-    basktet_cnt = price;
-    basket_total1.rerender((price).toString());
-    basket_total2.rerender((price).toString());
-    // update modal
-
-    // used for adding items:
-    // modal_basket.additive_rerender(make("modal-item", "counter_"+counter, counter.toString()));
+    let price = calc_price();
+    const i_cnt = calc_items_cnt();
+    if (i_cnt >= 3) {
+        basket_discount.setVisible(true);
+        basket_discount_value.rerender((price * DISCOUNT_PERCENTAGE).toFixed(2));
+        price -= price * DISCOUNT_PERCENTAGE;
+    } else {
+        basket_discount.setVisible(false);
+    }
+    basket_tax.rerender((price * TAX_PERCENTAGE).toFixed(2));
+    basktet_cnt = price + price * TAX_PERCENTAGE;
+    // when .00 display as whole number else with two decimal points
+    if (Number(basktet_cnt.toFixed(0)) === Number(basktet_cnt)) {
+        basket_total1.rerender(basktet_cnt.toString());
+    } else {
+        basket_total1.rerender(basktet_cnt.toFixed(2));
+    }
+    basket_total2.rerender(basktet_cnt.toFixed(2));
 }
 
 function display_empty_if_basket_empty(old_price, new_price) {
@@ -634,7 +682,18 @@ function render_preview_page() {
         "-->"+items+"<!--"
     );
 
-    const summary = join(make("h3", "total is "+basktet_cnt.toString() + "€"), make("preview-payment-btn"));
+    let price = calc_price();
+    let discount = "";
+    if (calc_items_cnt() >= 3) {
+        const disct = price * DISCOUNT_PERCENTAGE;
+        price -= disct;
+        discount = make("h3", "discount is " + disct.toFixed(2)+"€");
+    }
+    const tax = price * TAX_PERCENTAGE;
+    // price += tax;
+    // price should eq basktet_cnt
+
+    const summary = join(discount,make("h3", "tax is "+tax.toFixed(2)+"€"),make("h3", "total is "+basktet_cnt.toString() + "€"), make("preview-payment-btn"));
 
     items_container.rerender(join(make("preview-nav"), make("br"), make("title", "Your order"), table, summary));
 }
@@ -883,7 +942,8 @@ function render_thanks_page() {
     // hide basket
     document.getElementById("basket-modal-btn").classList.add("hide");
 
-    items_container.rerender("<h2> thanks, " + "Joseph" + " </h2> <br> <button class='btn btn-primary' onclick='action_thanks_back_to_shop();'>back to shop</button>");
+    // items_container.rerender("<h2> thanks, " + "Joseph" + " </h2> <br> <button class='btn btn-primary' onclick='action_thanks_back_to_shop();'>back to shop</button>");
+    items_container.rerender(make("thanks-page"));
 }
 
 function action_thanks_back_to_shop() {

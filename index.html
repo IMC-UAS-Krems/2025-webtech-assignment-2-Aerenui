@@ -19,9 +19,13 @@
         <div id="box"> <div class="container border border-2"> % </div> </div>
 
         <!-- SHOPPING PAGE COMPONENTS -->
-        <div id="basket-icon"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-basket-fill" viewBox="0 0 16 16">
-            <path d="M5.071 1.243a.5.5 0 0 1 .858.514L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 6h1.717zM3.5 10.5a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0z"/>
-        </svg> </div>
+
+        <!-- from bootstrap icons -->
+        <div id="basket-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-basket-fill" viewBox="0 0 16 16">
+                <path d="M5.071 1.243a.5.5 0 0 1 .858.514L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 6h1.717zM3.5 10.5a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0zm2.5 0a.5.5 0 1 0-1 0v3a.5.5 0 0 0 1 0z"/>
+            </svg>
+        </div>
 
         <div id="modal-checkout-btn">
             <!-- data-bs-dismiss="modal" -->
@@ -74,9 +78,11 @@
                         </div>
                         <div class="modal-footer">
                             <div class="container">
+                                %
+                                <div>Tax is %€</div>
                                 <div class="d-flex justify-content-between">
                                     <div class="align-items-center">
-                                        total is %€
+                                        Total is %€
                                     </div>
                                     <div>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -108,6 +114,14 @@
                 <input id="qty_mod_%" type="number" class="form-control input-number-hide-arrows" aria-label="quantity" value="1" min="1" onchange="if(this.value<1) action_item_remove('%'); else action_item_update('%', parseInt(this.value));">
                 <button class="input-group-text btn focus-ring" onclick="document.getElementById('qty_mod_%').value = 1 + parseInt(document.getElementById('qty_mod_%').value); action_item_update('%', parseInt(document.getElementById('qty_mod_%').value));">+</button>
             </div>
+        </div>
+
+        <div id="shop-title">
+            <header>
+                <div class="d-flex justify-content-center">
+                    <h1> Buy snacks for an entire day for a lonely cat </h1>
+                </div>
+            </header>
         </div>
 
         <div id="items-item">
@@ -273,7 +287,13 @@
         </div>
 
         <!-- THANKS PAGE COMPONENTS -->
+        <div id="thanks-page">
+            <h2> thanks for bringing joy to the life of unfortunate cats </h2>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-primary" onclick="action_thanks_back_to_shop();">back to shop</button>
+            </div>
 
+        </div>
 
     </template>
 
