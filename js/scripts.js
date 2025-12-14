@@ -82,6 +82,11 @@ function afterLoad() {
         cookie_start();
     else
         render_shopping_page();
+
+    // tooltip initialization
+    // SOURCE: https://getbootstrap.com/docs/5.3/components/tooltips/
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
 function importSyntheticComponents() {
@@ -382,7 +387,7 @@ function populateItems() {
 
 
 
-
+const PAGE_NAME = "LonelyCat";
 const TAX_PERCENTAGE = 0.2; // 20%
 const DISCOUNT_PERCENTAGE = 0.1; // 10%
 let basktet_cnt;
@@ -451,7 +456,7 @@ function general_page_init() {
 
     modal_checkout_btn = make_updatable("modal-checkout-btn", "disabled");
 
-    make("navbar", "Shop", basket_total1, make("basket-icon"))
+    make("navbar", PAGE_NAME, basket_total1, make("basket-icon"))
         .append("nav");
 
     make("basket-modal", modal_basket, basket_discount, basket_tax, basket_total2, modal_checkout_btn).append();
