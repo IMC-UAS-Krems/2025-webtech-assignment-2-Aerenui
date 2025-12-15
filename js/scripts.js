@@ -85,8 +85,11 @@ function afterLoad() {
 
     // tooltip initialization
     // SOURCE: https://getbootstrap.com/docs/5.3/components/tooltips/
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    // tooltipTriggerList.values().forEach((t) => { const _ = new bootstrap.Tooltip(t); });
+    // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').values().forEach((t) => { const _ = new bootstrap.Tooltip(t)});
 }
 
 function importSyntheticComponents() {
@@ -360,11 +363,17 @@ let items_container;
  * @type {Map<String,Item>}
  * */
 let ITEMS = new Map();
+let ITEMS_LISTING = new Map();
 function populateItems() {
     let id_cnt = 1;
     const make = (name, description, price, image_url) => {
-        ITEMS.set("i"+id_cnt.toString(), new Item("i"+id_cnt.toString(), name, description, price, image_url));
+        const id = "i"+id_cnt.toString();
+        ITEMS.set(id, new Item("i"+id_cnt.toString(), name, description, price, image_url));
         id_cnt++;
+        return id;
+    };
+    const make_listing = (id, item, for_who, price) => {
+        ITEMS_LISTING.set(id, { item: item, for_who: for_who, price: price });
     };
 
     /*make("Base Item", "description", 10, "/img/cat.png");
@@ -374,13 +383,33 @@ function populateItems() {
     make("Martin", "mr", 10000, "/img/cat.png");
     */
 
-    const names = [
-        "Luna", "Oliver", "Bella", "Milo", "Whiskers", "Shadow", "Simba", "Nala", "Leo", "Chloe", "Jasper", "Lucy", // used
-        "Charlie", "Kitty", "Felix", "Mittens", "Oreo", "Pumpkin", "Smokey", "Tiger"
+    // used internet for random snacks and ideas
+    // should not require sources since this is not actual code but data
+    const cats = [
+        { name: "Luna",      verb: "loves",         item: "tuna bites",        price: parseFloat((  1.50*3.0  ).toFixed(2)) },
+        { name: "Oliver",    verb: "enjoys",        item: "salmon jerky",      price: parseFloat((  2.00*3.0  ).toFixed(2)) },
+        { name: "Bella",     verb: "craves",        item: "chicken strips",    price: parseFloat((  1.20*3.0  ).toFixed(2)) },
+        { name: "Milo",      verb: "prefers",       item: "crunchy kibble",    price: parseFloat((  0.80*3.0  ).toFixed(2)) },
+        { name: "Whiskers",  verb: "adores",        item: "beef cubes",        price: parseFloat((  1.75*3.0  ).toFixed(2)) },
+        { name: "Shadow",    verb: "snacks on",     item: "cheese bits",       price: parseFloat((  1.10*3.0  ).toFixed(2)) },
+        { name: "Simba",     verb: "munches on",    item: "sardines",          price: parseFloat((  2.30*3.0  ).toFixed(2)) },
+        { name: "Nala",      verb: "loves",         item: "turkey slices",     price: parseFloat((  1.40*3.0  ).toFixed(2)) },
+        { name: "Leo",       verb: "enjoys",        item: "shrimp treats",     price: parseFloat((  2.50*3.0  ).toFixed(2)) },
+        { name: "Chloe",     verb: "craves",        item: "duck jerky",        price: parseFloat((  1.90*3.0  ).toFixed(2)) },
+        { name: "Jasper",    verb: "prefers",       item: "lamb bites",        price: parseFloat((  2.20*3.0  ).toFixed(2)) },
+        { name: "Lucy",      verb: "snacks on",     item: "yogurt drops",      price: parseFloat((  0.95*3.0  ).toFixed(2)) },
     ];
 
+    /*const names = [
+        "Luna", "Oliver", "Bella", "Milo", "Whiskers", "Shadow", "Simba", "Nala", "Leo", "Chloe", "Jasper", "Lucy", // used
+        "Charlie", "Kitty", "Felix", "Mittens", "Oreo", "Pumpkin", "Smokey", "Tiger"
+    ];*/
+
     for(let i=1;i<11+1; i++) {
-        make(names[i], "description", 5*i*i-3*i+4, "/img/cat"+i.toString()+".jpg");
+        // make("Snacks for " + names[i], "description", 5*i*i-3*i+4, "/img/cat"+i.toString()+".jpg");
+        const cat = cats[i];
+        const id = make("Snacks for " + cat.name, cat.name+" "+cat.verb+" "+cat.item, cat.price, "/img/cat"+i.toString()+".jpg");
+        make_listing(id, cat.item, cat.name, cat.price);
     }
 
 }
@@ -545,7 +574,7 @@ function action_item_buy(id) {
 
     rerender_basket_price();
 
-    let modal_updt = make_updatable("modal-item", "", ITEMS.get(id).name, ITEMS.get(id).price.toString(), id);
+    let modal_updt = make_updatable("modal-item", "", ITEMS.get(id).name, ITEMS.get(id).price.toFixed(2), id);
 
     BASKET_MODAL_HANDLES.set(id, modal_updt);
     modal_basket.additive_rerender(modal_updt);
@@ -580,7 +609,7 @@ function action_item_update(id, qty) {
     // console.log("called action_item_update with id='"+id+"', qty="+qty.toString());
     BASKET_ITEMS.set(id, qty);
     rerender_basket_price();
-    BASKET_MODAL_HANDLES.get(id).rerender(qty === 1 ? "" : qty.toString()+"x", ITEMS.get(id).name, (ITEMS.get(id).price * qty).toString(), id); // component-id="modal-item"
+    BASKET_MODAL_HANDLES.get(id).rerender(qty === 1 ? "" : qty.toString()+"x", ITEMS.get(id).name, (ITEMS.get(id).price * qty).toFixed(2), id); // component-id="modal-item"
     save_page_state();
 }
 
@@ -679,8 +708,14 @@ function render_preview_page() {
 
     const items = BASKET_ITEMS
         .entries()
-        .map(([id, cnt]) => make("preview-table-item", ITEMS.get(id).name, ITEMS.get(id).description, cnt.toString(), (ITEMS.get(id).price * cnt).toString()))
-        .reduce((a,b) => a+b.content+"\n", "");
+        .map(([id, cnt]) =>
+            make("preview-table-item",
+                ITEMS_LISTING.get(id).item, // ITEMS.get(id).name,
+                ITEMS_LISTING.get(id).for_who, // ITEMS.get(id).description,
+                cnt.toString(),
+                (ITEMS.get(id).price * cnt).toFixed(2)
+            )
+        ).reduce((a,b) => a+b.content+"\n", "");
 
     // the comment parts are a fix to prevent browser from removing template argument marker
     const table = make("preview-table-holder",
@@ -695,10 +730,8 @@ function render_preview_page() {
         discount = make("h3", "discount is " + disct.toFixed(2)+"€");
     }
     const tax = price * TAX_PERCENTAGE;
-    // price += tax;
-    // price should eq basktet_cnt
 
-    const summary = join(discount,make("h3", "tax is "+tax.toFixed(2)+"€"),make("h3", "total is "+basktet_cnt.toString() + "€"), make("preview-payment-btn"));
+    const summary = join(discount,make("h3", "tax is "+tax.toFixed(2)+"€"),make("h3", "total is "+basktet_cnt.toFixed(2) + "€"), make("preview-payment-btn"));
 
     items_container.rerender(join(make("preview-nav"), make("br"), make("title", "Your order"), table, summary));
 }

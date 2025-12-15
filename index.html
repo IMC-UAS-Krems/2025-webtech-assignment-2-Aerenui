@@ -107,7 +107,7 @@
         </div>
 
         <div id="items-item-buy-btn">
-            <button class="btn btn-primary w-100" onclick="action_item_buy('%')">Add to card</button>
+            <button class="btn btn-primary w-100" onclick="action_item_buy('%')">Add to cart</button>
         </div>
 
         <div id="items-item-buy-modify">
@@ -158,7 +158,7 @@
                     <thead>
                         <tr>
                             <th scope="col">Item</th>
-                            <th scope="col">Description</th>
+                            <th scope="col">For</th> <!-- Description -->
                             <th scope="col">Quantity</th>
                             <th scope="col">Price</th>
                         </tr>
@@ -258,7 +258,7 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <textarea class="form-control" id="message" type="text" placeholder="Message" style="height: 10rem;" ></textarea>
+                        <textarea class="form-control" id="message" type="text" placeholder="Message" style="min-height: 7rem;" ></textarea>
                         <label for="message">Message</label>
                     </div>
 
@@ -291,11 +291,11 @@
 
         <!-- THANKS PAGE COMPONENTS -->
         <div id="thanks-page">
-            <h2> thanks for bringing joy to the life of unfortunate cats </h2>
-            <div class="d-flex align-items-center">
+            <h2 class="d-flex justify-content-center"> thanks for bringing joy to the life of unfortunate cats </h2>
+            <img src="img/cat_thanks.gif" class="d-flex align-self-center" style="max-height: 60vh; max-width: 60vh;" alt="gif image of cat being happy">
+            <div class="d-flex justify-content-center w-100 pt-3">
                 <button class="btn btn-primary" onclick="action_thanks_back_to_shop();">back to shop</button>
             </div>
-
         </div>
 
     </template>
